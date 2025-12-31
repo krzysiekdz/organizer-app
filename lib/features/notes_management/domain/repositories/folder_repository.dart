@@ -1,0 +1,11 @@
+import '../entities/folder.dart';
+
+abstract class FolderRepository {
+  Future<List<Folder>> getFolders(String userId);
+  Future<List<Folder>> getFoldersByParentId(String userId, String? parentId);
+  Future<Folder> createFolder(Folder folder);
+  Future<void> updateFolder(Folder folder);
+  Future<void> deleteFolder(String folderId);
+  Future<Folder?> getFolderById(String folderId);
+}
+
