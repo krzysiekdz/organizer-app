@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:organizer/features/zoo/user.dart' show testUser;
 import 'core/injection/injection_container.dart' as di;
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await di.initializeDependencies();
-  runApp(const MyApp());
+  // WidgetsFlutterBinding.ensureInitialized();
+  // await di.initializeDependencies();
+  // runApp(const MyApp());
+  testUser();
 }
 
 class MyApp extends StatelessWidget {
@@ -21,7 +23,8 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: BlocProvider(
-        create: (context) => di.sl<AuthBloc>()..add(const AuthStateChecked(userId: null)),
+        create: (context) =>
+            di.sl<AuthBloc>()..add(const AuthStateChecked(userId: null)),
         child: const AuthWrapper(),
       ),
     );
@@ -48,7 +51,9 @@ class AuthWrapper extends StatelessWidget {
                   Text('Error: ${state.message}'),
                   ElevatedButton(
                     onPressed: () {
-                      context.read<AuthBloc>().add(const AuthStateChecked(userId: null));
+                      context.read<AuthBloc>().add(
+                        const AuthStateChecked(userId: null),
+                      );
                     },
                     child: const Text('Retry'),
                   ),
@@ -57,9 +62,7 @@ class AuthWrapper extends StatelessWidget {
             ),
           );
         }
-        return const Scaffold(
-          body: Center(child: CircularProgressIndicator()),
-        );
+        return const Scaffold(body: Center(child: CircularProgressIndicator()));
       },
     );
   }
@@ -97,27 +100,25 @@ class _LoginPageState extends State<LoginPage> {
 
     if (_isSignUp) {
       context.read<AuthBloc>().add(
-            SignUpRequested(email: email, password: password),
-          );
+        SignUpRequested(email: email, password: password),
+      );
     } else {
       context.read<AuthBloc>().add(
-            SignInRequested(email: email, password: password),
-          );
+        SignInRequested(email: email, password: password),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_isSignUp ? 'Sign Up' : 'Sign In'),
-      ),
+      appBar: AppBar(title: Text(_isSignUp ? 'Sign Up' : 'Sign In')),
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.message)));
           }
         },
         child: Padding(
@@ -164,9 +165,11 @@ class _LoginPageState extends State<LoginPage> {
                     _isSignUp = !_isSignUp;
                   });
                 },
-                child: Text(_isSignUp
-                    ? 'Already have an account? Sign In'
-                    : 'Don\'t have an account? Sign Up'),
+                child: Text(
+                  _isSignUp
+                      ? 'Already have an account? Sign In'
+                      : 'Don\'t have an account? Sign Up',
+                ),
               ),
             ],
           ),

@@ -1,0 +1,16 @@
+builders:
+  my_json_serializable:
+    # Format: package_name/path_to_builder_file
+    import: "package:organizer/dev/builder.dart"
+    builder_factories: ["myJsonBuilder"]
+    build_extensions: {".dart": [".json.dart"]}
+    auto_apply: root_package
+    build_to: source
+
+  my_copy_with_builder:
+    # Format: package_name/path_to_builder_file
+    import: "package:organizer/dev/builder.dart"
+    builder_factories: ["myCopyWithBuilder"]
+    build_extensions: {".dart": [".copy_with.dart"]}
+    auto_apply: root_package
+    build_to: source
