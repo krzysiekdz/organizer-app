@@ -1,0 +1,23 @@
+# commands used when new repo created
+
+# 1. Initialize local Git
+git init
+
+# 2. Stage and commit your files
+git add .
+git commit -m "Initial commit"
+
+# 3. Connect to your GitHub repository
+git remote add origin https://github.com/krzysiekdz/organizer-app.git
+
+# 4. Pull the remote README and place your work "on top" of it
+git pull origin main --rebase --allow-unrelated-histories
+
+# --- AT THIS POINT YOU ENCOUNTERED THE CONFLICT ---
+
+# 5. (After manually editing README.md to fix conflicts)
+git add README.md
+git rebase --continue
+
+# 6. Final Push
+git push -u origin main
