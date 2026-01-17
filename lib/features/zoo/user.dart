@@ -35,5 +35,3 @@ void testUser() {
   // print(user.toMap());
   // print(u2.toMap());
 }
-
-//napisac wlasny generator klas na podstawie adnotacji

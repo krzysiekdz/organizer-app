@@ -1,12 +1,18 @@
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+import '../models/user_model.dart';
+import '../../domain/entities/user.dart';
+
+// interfejs należałoby wydzielić do osobnego pliku, a implementację do osobnego pliku.
 
 abstract class AuthRemoteDataSource {
-  Future<String?> signInWithEmailAndPassword(String email, String password);
-  Future<String?> signUpWithEmailAndPassword(String email, String password);
+  Future<User?> signInWithEmailAndPassword(String email, String password);
+  Future<User?> signUpWithEmailAndPassword(String email, String password);
   Future<void> signOut();
-  Stream<String?> get authStateChanges;
-  String? get currentUserId;
+  Stream<User?> get authStateChanges;
+  User? get currentUser;
 }
+
+// potem zaimplementujem logowanie przez Google, Facebook, Apple, etc.
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final firebase_auth.FirebaseAuth firebaseAuth;
@@ -14,28 +20,36 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   AuthRemoteDataSourceImpl(this.firebaseAuth);
 
   @override
-  Future<String?> signInWithEmailAndPassword(
-      String email, String password) async {
+  Future<User?> signInWithEmailAndPassword(
+    String email,
+    String password,
+  ) async {
     try {
       final userCredential = await firebaseAuth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-      return userCredential.user?.uid;
+      final firebaseUser = userCredential.user;
+      if (firebaseUser == null) return null;
+      return UserModel.fromFirebaseUser(firebaseUser);
     } catch (e) {
       rethrow;
     }
   }
 
   @override
-  Future<String?> signUpWithEmailAndPassword(
-      String email, String password) async {
+  Future<User?> signUpWithEmailAndPassword(
+    String email,
+    String password,
+  ) async {
     try {
       final userCredential = await firebaseAuth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-      return userCredential.user?.uid;
+      final firebaseUser = userCredential.user;
+      if (firebaseUser == null) return null;
+      return UserModel.fromFirebaseUser(firebaseUser);
     } catch (e) {
       rethrow;
     }
@@ -47,11 +61,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Stream<String?> get authStateChanges {
-    return firebaseAuth.authStateChanges().map((user) => user?.uid);
+  Stream<User?> get authStateChanges {
+    return firebaseAuth.authStateChanges().map((firebaseUser) {
+      if (firebaseUser == null) return null;
+      return UserModel.fromFirebaseUser(firebaseUser);
+    });
   }
 
   @override
-  String? get currentUserId => firebaseAuth.currentUser?.uid;
+  User? get currentUser {
+    final firebaseUser = firebaseAuth.currentUser;
+    if (firebaseUser == null) return null;
+    return UserModel.fromFirebaseUser(firebaseUser);
+  }
 }
-
