@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1098332689265",
+    "project_id": "organizer-d7f2c",
+    "storage_bucket": "organizer-d7f2c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1098332689265:android:0e538f4c10226eb1625cd0",
+        "android_client_info": {
+          "package_name": "com.kddev.organizer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAEAftAdM2A5nYbtbBQ7gMRpjmglIXhwQA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,13 +1,11 @@
 part of 'folder_bloc.dart';
 
-abstract class FolderState extends Equatable {
+sealed class FolderState extends Equatable {
   const FolderState();
 
   @override
   List<Object?> get props => [];
 }
-
-class FolderInitial extends FolderState {}
 
 class FolderLoading extends FolderState {}
 

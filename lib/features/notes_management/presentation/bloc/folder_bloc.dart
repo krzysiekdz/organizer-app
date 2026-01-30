@@ -13,7 +13,7 @@ class FolderBloc extends Bloc<FolderEvent, FolderState> {
   FolderBloc({
     required this.folderRepository,
     required this.userId,
-  }) : super(FolderInitial()) {
+  }) : super(FolderLoading()) {
     on<LoadFolders>(_onLoadFolders);
     on<LoadFoldersByParentId>(_onLoadFoldersByParentId);
     on<CreateFolder>(_onCreateFolder);

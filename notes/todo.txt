@@ -1,0 +1,37 @@
+edycja, usuwanie folderow 
+dodawanie folderu w folderze (zagniezdzenia)
+usuwanie - zagniezdzone 
+
+dodawanie notatek w folderach
+edycja notatki, usuwanie notatki 
+
+edycja notatki / dodawanie folderow - obserwacja zmian na dwoch urzadzeniach
+
+utworzenie 2 kont 
+dodawanie znajomych, udostepnianie znajomym notatek 
+wspoldzielenie notatki 
+wspoldzielnie folderow
+uprawnienia? odczyt, edycja, usuwanie 
+
+dodawanie kont - uzytkownik
+dodanie osob - ktore nie sa uzywkotnikami, ale mozna do nich przypisywac rzeczy
+
+ogólnie mamy aktorów, mamy rzeczy i mamy czynnosci
+
+dodawanie innego rodzaju notatek - dokumentow - pdf
+
+czat - operacje na notatkach, zapytania 
+
+
+organizer - notatki jako jedna z funkcji 
+
+moduły :
+notatki dowolne (notatki mozna przenosic pomiedzy modułami)
+lista lekow jakie ktos bierze (mozna dodac czlonkow rodziny, ogolnie osoby, ktore nie korzystaja, ale sie nimi zarzadza)
+historia chorob / lekarzy 
+przepisy
+taki "pożarnik" dla kazdego
+wydatki
+harmonogram/kalendarz
+lista filmow, seriali, gier - skad je pobrac?
+    
