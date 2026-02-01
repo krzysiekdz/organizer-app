@@ -4,6 +4,7 @@ import '../bloc/folder_bloc.dart';
 
 class FolderFormDialog extends StatefulWidget {
   final String? parentId;
+  final int maxLength = 40;
 
   const FolderFormDialog({super.key, this.parentId});
 
@@ -65,44 +66,37 @@ class _FolderFormDialogState extends State<FolderFormDialog> {
       },
       child: AlertDialog(
         title: const Text('Create New Folder'),
+        contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
         content: Form(
           key: _formKey,
-          // Use autovalidateMode for better UX (shows errors as user types)
           autovalidateMode: AutovalidateMode.onUserInteraction,
           child: TextFormField(
             controller: _nameController,
-            // Alternative with state variable (simpler for single field):
-            // value: _folderName,
-            // onChanged: _updateFolderName,
             decoration: const InputDecoration(
               labelText: 'Folder Name',
               hintText: 'Enter folder name',
               border: OutlineInputBorder(),
-              // Add prefix icon for better UX
               prefixIcon: Icon(Icons.folder_outlined),
+              // Label always floats above to avoid collision with input on small screens
+              floatingLabelBehavior: FloatingLabelBehavior.always,
+              // Enough vertical space so label and input don't overlap
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 12,
+              ),
+              isDense: true,
             ),
             autofocus: true,
-            textCapitalization: TextCapitalization.words,
-            // Better keyboard action
+            // textCapitalization: TextCapitalization.words,
             textInputAction: TextInputAction.done,
-            // Max length to prevent extremely long names
-            maxLength: 20,
-            // buildCounter:
-            //     (
-            //       context, {
-            //       required currentLength,
-            //       required isFocused,
-            //       maxLength,
-            //     }) => Text('$currentLength/$maxLength'),
+            maxLength: widget.maxLength,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
                 return 'Please enter a folder name';
               }
-              // Additional validation: check for whitespace-only names
-              if (value.trim().length < 1) {
+              if (value.trim().isEmpty) {
                 return 'Folder name cannot be empty';
               }
-              // Optional: check for invalid characters
               if (value.contains('  ')) {
                 return 'Folder name cannot contain consecutive spaces';
               }
