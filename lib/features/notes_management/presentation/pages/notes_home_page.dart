@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:organizer/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:organizer/core/injection/injection_container.dart' as di;
-import 'package:organizer/features/notes_management/presentation/bloc/folder_bloc.dart';
-import 'package:organizer/features/notes_management/domain/entities/folder.dart';
+import '../bloc/folder_bloc.dart';
 import 'package:organizer/features/notes_management/domain/repositories/folder_repository.dart';
-import 'package:organizer/features/notes_management/presentation/widgets/folder_form_dialog.dart';
+import '../widgets/folder_form_dialog.dart';
+import '../widgets/folders_grid.dart';
 
 class NotesHomePage extends StatelessWidget {
   const NotesHomePage({super.key});
@@ -18,6 +18,7 @@ class NotesHomePage extends StatelessWidget {
       create: (context) => FolderBloc(
         folderRepository: di.sl<FolderRepository>(),
         userId: user.id,
+        parentId: null,
       )..add(const LoadFoldersByParentId(parentId: null)),
       child: Scaffold(
         appBar: AppBar(
@@ -31,14 +32,16 @@ class NotesHomePage extends StatelessWidget {
             ),
           ],
         ),
-        body: BlocBuilder<FolderBloc, FolderState>(
-          builder: (context, state) {
-            return switch (state) {
-              FolderLoading() => _buildLoadingState(context),
-              FolderLoaded() => _buildLoadedState(context, state),
-              FolderError() => _buildErrorState(context, state),
-            };
-          },
+        body: SafeArea(
+          child: BlocBuilder<FolderBloc, FolderState>(
+            builder: (context, state) {
+              return switch (state) {
+                FolderLoading() => _buildLoadingState(context),
+                FolderLoaded() => _buildLoadedState(context, state),
+                FolderError() => _buildErrorState(context, state),
+              };
+            },
+          ),
         ),
         floatingActionButton: Builder(
           builder: (context) {
@@ -87,8 +90,8 @@ class NotesHomePage extends StatelessWidget {
           ElevatedButton(
             onPressed: () {
               context.read<FolderBloc>().add(
-                    const LoadFoldersByParentId(parentId: null),
-                  );
+                const LoadFoldersByParentId(parentId: null),
+              );
             },
             child: const Text('Retry'),
           ),
@@ -104,7 +107,7 @@ class NotesHomePage extends StatelessWidget {
       return _buildEmptyState(context);
     }
 
-    return _buildFoldersGrid(context, folders);
+    return FoldersGrid(folders: folders);
   }
 
   Widget _buildEmptyState(BuildContext context) {
@@ -116,82 +119,14 @@ class NotesHomePage extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             'No folders yet',
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.grey.shade600,
-            ),
+            style: TextStyle(fontSize: 18, color: Colors.grey.shade600),
           ),
           const SizedBox(height: 8),
           Text(
             'Create your first folder to get started',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade500,
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.grey.shade500),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildFoldersGrid(BuildContext context, List<Folder> folders) {
-    return GridView.builder(
-      padding: const EdgeInsets.all(16),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-        childAspectRatio: 1.1,
-      ),
-      itemCount: folders.length,
-      itemBuilder: (context, index) {
-        return _FolderCard(folder: folders[index]);
-      },
-    );
-  }
-}
-
-class _FolderCard extends StatelessWidget {
-  final Folder folder;
-
-  const _FolderCard({required this.folder});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: InkWell(
-        onTap: () {
-          // TODO: Navigate to folder contents
-        },
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.folder,
-                size: 48,
-                color: Colors.blue.shade400,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                folder.name,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
