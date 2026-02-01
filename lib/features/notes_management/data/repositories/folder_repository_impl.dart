@@ -19,6 +19,13 @@ class FolderRepositoryImpl implements FolderRepository {
   }
 
   @override
+  Stream<List<Folder>> watchFolders(String userId, String? parentId) {
+    return remoteDataSource.watchFolders(userId, parentId).map(
+          (models) => models.map((m) => m.toEntity()).toList(),
+        );
+  }
+
+  @override
   Future<Folder> createFolder(Folder folder) async {
     final folderModel = FolderModel.fromEntity(folder);
     return await remoteDataSource.createFolder(folderModel);

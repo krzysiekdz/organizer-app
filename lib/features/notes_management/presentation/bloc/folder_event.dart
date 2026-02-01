@@ -51,3 +51,13 @@ class DeleteFolder extends FolderEvent {
   List<Object?> get props => [folderId];
 }
 
+/// Fired when the folders collection changes (e.g. from another device).
+class FoldersChanged extends FolderEvent {
+  final List<Folder> folders;
+
+  const FoldersChanged({required this.folders});
+
+  @override
+  List<Object?> get props => [folders];
+}
+

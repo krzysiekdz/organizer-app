@@ -4,6 +4,7 @@ import '../models/folder_model.dart';
 abstract class FolderRemoteDataSource {
   Future<List<FolderModel>> getFolders(String userId);
   Future<List<FolderModel>> getFoldersByParentId(String userId, String? parentId);
+  Stream<List<FolderModel>> watchFolders(String userId, String? parentId);
   Future<FolderModel> createFolder(FolderModel folder);
   Future<void> updateFolder(FolderModel folder);
   Future<void> deleteFolder(String folderId);
@@ -46,6 +47,27 @@ class FolderRemoteDataSourceImpl implements FolderRemoteDataSource {
     return querySnapshot.docs
         .map((doc) => FolderModel.fromFirestore(doc))
         .toList();
+  }
+
+  @override
+  Stream<List<FolderModel>> watchFolders(String userId, String? parentId) {
+    Query query = firestore
+        .collection('folders')
+        .where('userId', isEqualTo: userId);
+
+    if (parentId == null) {
+      query = query.where('parentId', isNull: true);
+    } else {
+      query = query.where('parentId', isEqualTo: parentId);
+    }
+
+    return query.snapshots().map((snapshot) {
+      final list = snapshot.docs
+          .map((doc) => FolderModel.fromFirestore(doc))
+          .toList();
+      list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return list;
+    });
   }
 
   @override

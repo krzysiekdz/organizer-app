@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../domain/entities/folder.dart';
@@ -9,16 +10,31 @@ part 'folder_state.dart';
 class FolderBloc extends Bloc<FolderEvent, FolderState> {
   final FolderRepository folderRepository;
   final String userId;
+  final String? parentId;
+  StreamSubscription<List<Folder>>? _foldersSubscription;
 
   FolderBloc({
     required this.folderRepository,
     required this.userId,
+    required this.parentId,
   }) : super(FolderLoading()) {
     on<LoadFolders>(_onLoadFolders);
     on<LoadFoldersByParentId>(_onLoadFoldersByParentId);
     on<CreateFolder>(_onCreateFolder);
     on<UpdateFolder>(_onUpdateFolder);
     on<DeleteFolder>(_onDeleteFolder);
+    on<FoldersChanged>(_onFoldersChanged);
+
+    // Listen to folder collection changes for this view (e.g. edits from another device)
+    _foldersSubscription = folderRepository.watchFolders(userId, parentId).listen(
+          (folders) => add(FoldersChanged(folders: folders)),
+        );
+  }
+
+  @override
+  Future<void> close() {
+    _foldersSubscription?.cancel();
+    return super.close();
   }
 
   Future<void> _onLoadFolders(
@@ -26,7 +42,7 @@ class FolderBloc extends Bloc<FolderEvent, FolderState> {
     emit(FolderLoading());
     try {
       final folders = await folderRepository.getFolders(userId);
-      emit(FolderLoaded(folders: folders));
+      emit(FolderLoaded(folders: folders, parentId: parentId));
     } catch (e) {
       emit(FolderError(message: e.toString()));
     }
@@ -38,12 +54,17 @@ class FolderBloc extends Bloc<FolderEvent, FolderState> {
     try {
       final folders = await folderRepository.getFoldersByParentId(
         userId,
-        event.parentId,
+        parentId,
       );
-      emit(FolderLoaded(folders: folders));
+      emit(FolderLoaded(folders: folders, parentId: parentId));
     } catch (e) {
       emit(FolderError(message: e.toString()));
     }
+  }
+
+  void _onFoldersChanged(FoldersChanged event, Emitter<FolderState> emit) {
+    // Stream already filtered by this bloc's parentId
+    emit(FolderLoaded(folders: event.folders, parentId: parentId));
   }
 
   Future<void> _onCreateFolder(
@@ -72,7 +93,10 @@ class FolderBloc extends Bloc<FolderEvent, FolderState> {
         final updatedFolders = currentState.folders.map((folder) {
           return folder.id == event.folder.id ? event.folder : folder;
         }).toList();
-        emit(FolderLoaded(folders: updatedFolders));
+        emit(FolderLoaded(
+          folders: updatedFolders,
+          parentId: parentId,
+        ));
       }
     } catch (e) {
       emit(FolderError(message: e.toString()));
@@ -88,7 +112,10 @@ class FolderBloc extends Bloc<FolderEvent, FolderState> {
         final updatedFolders = currentState.folders
             .where((folder) => folder.id != event.folderId)
             .toList();
-        emit(FolderLoaded(folders: updatedFolders));
+        emit(FolderLoaded(
+          folders: updatedFolders,
+          parentId: parentId,
+        ));
       }
     } catch (e) {
       emit(FolderError(message: e.toString()));
