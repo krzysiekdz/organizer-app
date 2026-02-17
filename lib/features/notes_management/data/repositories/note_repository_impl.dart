@@ -8,11 +8,6 @@ class NoteRepositoryImpl implements NoteRepository {
   NoteRepositoryImpl(this.remoteDataSource);
 
   @override
-  Future<List<Note>> getNotes(String userId) async {
-    return await remoteDataSource.getNotes(userId);
-  }
-
-  @override
   Future<List<Note>> getNotesByFolderId(String userId, String? folderId) async {
     return await remoteDataSource.getNotesByFolderId(userId, folderId);
   }
@@ -37,4 +32,3 @@ class NoteRepositoryImpl implements NoteRepository {
     return await remoteDataSource.getNoteById(noteId);
   }
 }
-

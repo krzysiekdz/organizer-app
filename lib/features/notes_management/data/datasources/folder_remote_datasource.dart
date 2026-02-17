@@ -1,37 +1,26 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../domain/entities/folder.dart';
 import '../models/folder_model.dart';
 
-abstract class FolderRemoteDataSource {
-  Future<List<FolderModel>> getFolders(String userId);
-  Future<List<FolderModel>> getFoldersByParentId(String userId, String? parentId);
-  Stream<List<FolderModel>> watchFolders(String userId, String? parentId);
-  Future<FolderModel> createFolder(FolderModel folder);
-  Future<void> updateFolder(FolderModel folder);
+abstract interface class FolderRemoteDataSource {
+  Future<List<Folder>> getFoldersByParentId(String userId, String? parentId);
+  Stream<List<Folder>> watchFolders(String userId, String? parentId);
+  Future<Folder> createFolder(Folder folder);
+  Future<void> updateFolder(Folder folder);
   Future<void> deleteFolder(String folderId);
-  Future<FolderModel?> getFolderById(String folderId);
+  Future<Folder?> getFolderById(String folderId);
 }
 
-class FolderRemoteDataSourceImpl implements FolderRemoteDataSource {
+final class FolderRemoteDataSourceImpl implements FolderRemoteDataSource {
   final FirebaseFirestore firestore;
 
   FolderRemoteDataSourceImpl(this.firestore);
 
   @override
-  Future<List<FolderModel>> getFolders(String userId) async {
-    final querySnapshot = await firestore
-        .collection('folders')
-        .where('userId', isEqualTo: userId)
-        .orderBy('createdAt', descending: true)
-        .get();
-
-    return querySnapshot.docs
-        .map((doc) => FolderModel.fromFirestore(doc))
-        .toList();
-  }
-
-  @override
-  Future<List<FolderModel>> getFoldersByParentId(
-      String userId, String? parentId) async {
+  Future<List<Folder>> getFoldersByParentId(
+    String userId,
+    String? parentId,
+  ) async {
     Query query = firestore
         .collection('folders')
         .where('userId', isEqualTo: userId);
@@ -42,7 +31,9 @@ class FolderRemoteDataSourceImpl implements FolderRemoteDataSource {
       query = query.where('parentId', isEqualTo: parentId);
     }
 
-    final querySnapshot = await query.orderBy('createdAt', descending: true).get();
+    final querySnapshot = await query
+        .orderBy('createdAt', descending: true)
+        .get();
 
     return querySnapshot.docs
         .map((doc) => FolderModel.fromFirestore(doc))
@@ -50,7 +41,7 @@ class FolderRemoteDataSourceImpl implements FolderRemoteDataSource {
   }
 
   @override
-  Stream<List<FolderModel>> watchFolders(String userId, String? parentId) {
+  Stream<List<Folder>> watchFolders(String userId, String? parentId) {
     Query query = firestore
         .collection('folders')
         .where('userId', isEqualTo: userId);
@@ -71,24 +62,18 @@ class FolderRemoteDataSourceImpl implements FolderRemoteDataSource {
   }
 
   @override
-  Future<FolderModel> createFolder(FolderModel folder) async {
+  Future<Folder> createFolder(Folder folder) async {
     final docRef = firestore.collection('folders').doc();
-    final folderWithId = FolderModel(
-      id: docRef.id,
-      name: folder.name,
-      parentId: folder.parentId,
-      userId: folder.userId,
-      createdAt: folder.createdAt,
-    );
-    await docRef.set(folderWithId.toFirestore());
-    return folderWithId;
+    await docRef.set(FolderModel.toFirestore(folder));
+    return FolderModel.fromFirestore(await docRef.get());
   }
 
   @override
-  Future<void> updateFolder(FolderModel folder) async {
-    await firestore.collection('folders').doc(folder.id).update(
-          folder.toFirestore(),
-        );
+  Future<void> updateFolder(Folder folder) async {
+    await firestore
+        .collection('folders')
+        .doc(folder.id)
+        .update(FolderModel.toFirestore(folder));
   }
 
   @override
@@ -97,10 +82,9 @@ class FolderRemoteDataSourceImpl implements FolderRemoteDataSource {
   }
 
   @override
-  Future<FolderModel?> getFolderById(String folderId) async {
+  Future<Folder?> getFolderById(String folderId) async {
     final doc = await firestore.collection('folders').doc(folderId).get();
     if (!doc.exists) return null;
     return FolderModel.fromFirestore(doc);
   }
 }
-

@@ -1,31 +1,31 @@
 part of 'folder_bloc.dart';
 
-sealed class FolderState extends Equatable {
-  const FolderState();
+sealed class FoldersState extends Equatable {
+  const FoldersState();
 
   @override
   List<Object?> get props => [];
 }
 
-class FolderLoading extends FolderState {}
+class FoldersLoading extends FoldersState {}
 
-class FolderLoaded extends FolderState {
+class FoldersLoaded extends FoldersState {
   final List<Folder> folders;
+
   /// Current view filter: null = root folders, non-null = children of that parent.
   final String? parentId;
 
-  const FolderLoaded({required this.folders, this.parentId});
+  const FoldersLoaded({required this.folders, this.parentId});
 
   @override
   List<Object?> get props => [folders, parentId];
 }
 
-class FolderError extends FolderState {
+class FoldersError extends FoldersState {
   final String message;
 
-  const FolderError({required this.message});
+  const FoldersError({required this.message});
 
   @override
   List<Object?> get props => [message];
 }
-

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../bloc/folder_bloc.dart';
+import '../bloc/folder_form/folder_form_bloc.dart';
 
 class FolderFormDialog extends StatefulWidget {
   final String? parentId;
@@ -37,25 +37,21 @@ class _FolderFormDialogState extends State<FolderFormDialog> {
       // With state variable: final name = _folderName.trim();
 
       if (name.isNotEmpty) {
-        context.read<FolderBloc>().add(
-          CreateFolder(name: name, parentId: widget.parentId),
+        context.read<FolderFormBloc>().add(
+          CreateFolderSubmitted(name: name, parentId: widget.parentId),
         );
-        // Don't close immediately - let BLoC listener handle it
-        // This allows showing loading/error states if needed
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<FolderBloc, FolderState>(
+    return BlocListener<FolderFormBloc, FolderFormState>(
       listener: (context, state) {
-        // Close dialog when folders are reloaded (after successful creation)
-        if (state is FolderLoaded) {
+        if (state is FolderFormSuccess) {
           Navigator.of(context).pop();
         }
-        // Show error snackbar if creation fails
-        if (state is FolderError) {
+        if (state is FolderFormError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Failed to create folder: ${state.message}'),
@@ -110,10 +106,9 @@ class _FolderFormDialogState extends State<FolderFormDialog> {
             onPressed: () => Navigator.of(context).pop(),
             child: const Text('Cancel'),
           ),
-          BlocBuilder<FolderBloc, FolderState>(
+          BlocBuilder<FolderFormBloc, FolderFormState>(
             builder: (context, state) {
-              // Show loading when folders are being reloaded after creation
-              final isLoading = state is FolderLoading;
+              final isLoading = state is FolderFormLoading;
               return ElevatedButton(
                 onPressed: isLoading ? null : _submit,
                 child: isLoading

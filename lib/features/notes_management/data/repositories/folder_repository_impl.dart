@@ -1,17 +1,11 @@
 import '../../domain/entities/folder.dart';
 import '../../domain/repositories/folder_repository.dart';
 import '../datasources/folder_remote_datasource.dart';
-import '../models/folder_model.dart';
 
 class FolderRepositoryImpl implements FolderRepository {
   final FolderRemoteDataSource remoteDataSource;
 
   FolderRepositoryImpl(this.remoteDataSource);
-
-  @override
-  Future<List<Folder>> getFolders(String userId) async {
-    return await remoteDataSource.getFolders(userId);
-  }
 
   @override
   Future<List<Folder>> getFoldersByParentId(String userId, String? parentId) async {
@@ -20,21 +14,17 @@ class FolderRepositoryImpl implements FolderRepository {
 
   @override
   Stream<List<Folder>> watchFolders(String userId, String? parentId) {
-    return remoteDataSource.watchFolders(userId, parentId).map(
-          (models) => models.map((m) => m.toEntity()).toList(),
-        );
+    return remoteDataSource.watchFolders(userId, parentId);
   }
 
   @override
   Future<Folder> createFolder(Folder folder) async {
-    final folderModel = FolderModel.fromEntity(folder);
-    return await remoteDataSource.createFolder(folderModel);
+    return await remoteDataSource.createFolder(folder);
   }
 
   @override
   Future<void> updateFolder(Folder folder) async {
-    final folderModel = FolderModel.fromEntity(folder);
-    await remoteDataSource.updateFolder(folderModel);
+    await remoteDataSource.updateFolder(folder);
   }
 
   @override
@@ -47,4 +37,3 @@ class FolderRepositoryImpl implements FolderRepository {
     return await remoteDataSource.getFolderById(folderId);
   }
 }
-

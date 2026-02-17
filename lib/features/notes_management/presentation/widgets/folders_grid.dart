@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:organizer/features/notes_management/domain/entities/folder.dart';
-import 'folder_card.dart';
+import 'folder_card_alt.dart' show FolderCardAlt;
+// import 'folder_card.dart';
 
 class FoldersGrid extends StatelessWidget {
   const FoldersGrid({super.key, required this.folders});
@@ -11,8 +12,9 @@ class FoldersGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final crossAxisCount = constraints.maxWidth ~/ 120;
-        const spacing = 8.0;
+        final divideBy = 100;
+        final crossAxisCount = constraints.maxWidth ~/ divideBy;
+        const spacing = 4.0;
         const padding = 8.0;
         final width =
             constraints.maxWidth - padding * 2 - spacing * (crossAxisCount - 1);
@@ -25,12 +27,12 @@ class FoldersGrid extends StatelessWidget {
             child: Wrap(
               spacing: spacing,
               runSpacing: spacing,
-              crossAxisAlignment: WrapCrossAlignment.center,
+              // crossAxisAlignment: WrapCrossAlignment.center,
               children: folders
                   .map(
                     (folder) => SizedBox(
                       width: itemWidth,
-                      child: FolderCard(folder: folder),
+                      child: FolderCardAlt(folder: folder),
                     ),
                   )
                   .toList(),

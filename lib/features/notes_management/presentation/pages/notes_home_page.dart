@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:organizer/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:organizer/core/injection/injection_container.dart' as di;
-import '../bloc/folder_bloc.dart';
+import '../bloc/folder_content/folder_bloc.dart';
+import '../bloc/folder_form/folder_form_bloc.dart';
 import 'package:organizer/features/notes_management/domain/repositories/folder_repository.dart';
+import 'package:organizer/features/notes_management/domain/repositories/note_repository.dart';
+import '../bloc/note_form/note_form_bloc.dart';
+import 'note_form_page.dart';
 import '../widgets/folder_form_dialog.dart';
 import '../widgets/folders_grid.dart';
 
@@ -25,6 +29,23 @@ class NotesHomePage extends StatelessWidget {
           title: const Text('My Notes'),
           actions: [
             IconButton(
+              icon: const Icon(Icons.note_add),
+              tooltip: 'New note',
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (context) => BlocProvider(
+                      create: (context) => NoteFormBloc(
+                        noteRepository: di.sl<NoteRepository>(),
+                        userId: user.id,
+                      ),
+                      child: const NoteFormPage(folderId: null),
+                    ),
+                  ),
+                );
+              },
+            ),
+            IconButton(
               icon: const Icon(Icons.logout),
               onPressed: () {
                 context.read<AuthBloc>().add(const SignOutRequested());
@@ -33,12 +54,12 @@ class NotesHomePage extends StatelessWidget {
           ],
         ),
         body: SafeArea(
-          child: BlocBuilder<FolderBloc, FolderState>(
+          child: BlocBuilder<FolderBloc, FoldersState>(
             builder: (context, state) {
               return switch (state) {
-                FolderLoading() => _buildLoadingState(context),
-                FolderLoaded() => _buildLoadedState(context, state),
-                FolderError() => _buildErrorState(context, state),
+                FoldersLoading() => _buildLoadingState(context),
+                FoldersLoaded() => _buildLoadedState(context, state),
+                FoldersError() => _buildErrorState(context, state),
               };
             },
           ),
@@ -47,12 +68,13 @@ class NotesHomePage extends StatelessWidget {
           builder: (context) {
             return FloatingActionButton(
               onPressed: () {
-                // Get the FolderBloc from the current context and provide it to the dialog
-                final folderBloc = context.read<FolderBloc>();
                 showDialog(
                   context: context,
-                  builder: (dialogContext) => BlocProvider.value(
-                    value: folderBloc,
+                  builder: (dialogContext) => BlocProvider(
+                    create: (context) => FolderFormBloc(
+                      folderRepository: di.sl<FolderRepository>(),
+                      userId: user.id,
+                    ),
                     child: const FolderFormDialog(parentId: null),
                   ),
                 );
@@ -69,7 +91,7 @@ class NotesHomePage extends StatelessWidget {
     return const Center(child: CircularProgressIndicator());
   }
 
-  Widget _buildErrorState(BuildContext context, FolderError state) {
+  Widget _buildErrorState(BuildContext context, FoldersError state) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -100,7 +122,7 @@ class NotesHomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildLoadedState(BuildContext context, FolderLoaded state) {
+  Widget _buildLoadedState(BuildContext context, FoldersLoaded state) {
     final folders = state.folders;
 
     if (folders.isEmpty) {

@@ -1,21 +1,16 @@
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-class Folder extends Equatable {
-  final String id;
-  final String name;
-  final String? parentId;
-  final String userId;
-  final DateTime createdAt;
+part 'folder.freezed.dart';
 
-  const Folder({
-    required this.id,
-    required this.name,
-    this.parentId,
-    required this.userId,
-    required this.createdAt,
-  });
+@freezed
+sealed class Folder with _$Folder {
+  const Folder._();
 
-  @override
-  List<Object?> get props => [id, name, parentId, userId, createdAt];
+  const factory Folder({
+    required String id,
+    required String name,
+    String? parentId,
+    required String userId,
+    required DateTime createdAt,
+  }) = _Folder;
 }
-

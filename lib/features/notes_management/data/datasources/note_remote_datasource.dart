@@ -3,7 +3,6 @@ import '../../domain/entities/note.dart';
 import '../models/note_model.dart';
 
 abstract class NoteRemoteDataSource {
-  Future<List<Note>> getNotes(String userId);
   Future<List<Note>> getNotesByFolderId(String userId, String? folderId);
   Future<Note> createNote(Note note);
   Future<void> updateNote(Note note);
@@ -17,19 +16,6 @@ class NoteRemoteDataSourceImpl implements NoteRemoteDataSource {
   NoteRemoteDataSourceImpl(this.firestore);
 
   @override
-  Future<List<Note>> getNotes(String userId) async {
-    final querySnapshot = await firestore
-        .collection('notes')
-        .where('userId', isEqualTo: userId)
-        .orderBy('createdAt', descending: true)
-        .get();
-
-    return querySnapshot.docs
-        .map((doc) => NoteModel.fromFirestore(doc))
-        .toList();
-  }
-
-  @override
   Future<List<Note>> getNotesByFolderId(String userId, String? folderId) async {
     Query query = firestore
         .collection('notes')
@@ -41,7 +27,9 @@ class NoteRemoteDataSourceImpl implements NoteRemoteDataSource {
       query = query.where('folderId', isEqualTo: folderId);
     }
 
-    final querySnapshot = await query.orderBy('createdAt', descending: true).get();
+    final querySnapshot = await query
+        .orderBy('createdAt', descending: true)
+        .get();
 
     return querySnapshot.docs
         .map((doc) => NoteModel.fromFirestore(doc))
@@ -54,7 +42,7 @@ class NoteRemoteDataSourceImpl implements NoteRemoteDataSource {
     final noteData = NoteModel.toFirestore(note);
     noteData['id'] = docRef.id;
     await docRef.set(noteData);
-    
+
     // Return the note with the new ID
     return NoteModel.fromFirestore(await docRef.get());
   }
@@ -77,4 +65,3 @@ class NoteRemoteDataSourceImpl implements NoteRemoteDataSource {
     return NoteModel.fromFirestore(doc);
   }
 }
-

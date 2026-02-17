@@ -1,15 +1,11 @@
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-class TodoTask extends Equatable {
-  final String task;
-  final bool isDone;
+part 'todo_task.freezed.dart';
 
-  const TodoTask({
-    required this.task,
-    required this.isDone,
-  });
+@freezed
+sealed class TodoTask with _$TodoTask {
+  const TodoTask._();
 
-  @override
-  List<Object?> get props => [task, isDone];
+  const factory TodoTask({required String task, required bool isDone}) =
+      _TodoTask;
 }
-

@@ -7,10 +7,6 @@ abstract class FolderEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class LoadFolders extends FolderEvent {
-  const LoadFolders();
-}
-
 class LoadFoldersByParentId extends FolderEvent {
   final String? parentId;
 
@@ -18,28 +14,6 @@ class LoadFoldersByParentId extends FolderEvent {
 
   @override
   List<Object?> get props => [parentId];
-}
-
-class CreateFolder extends FolderEvent {
-  final String name;
-  final String? parentId;
-
-  const CreateFolder({
-    required this.name,
-    this.parentId,
-  });
-
-  @override
-  List<Object?> get props => [name, parentId];
-}
-
-class UpdateFolder extends FolderEvent {
-  final Folder folder;
-
-  const UpdateFolder({required this.folder});
-
-  @override
-  List<Object?> get props => [folder];
 }
 
 class DeleteFolder extends FolderEvent {
@@ -60,4 +34,3 @@ class FoldersChanged extends FolderEvent {
   @override
   List<Object?> get props => [folders];
 }
-
