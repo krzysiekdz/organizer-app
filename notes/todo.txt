@@ -1,11 +1,18 @@
+otwarcie podgladu notatki 
+wejscie w folder - navigator
+    wyswietlnie sciezki gdzie jestesmy
+
+sprawdzac, aby folder nie miał takiej samej nazwy jaka juz jest (w obrebie parentId)
+
 edycja, usuwanie folderow 
 dodawanie folderu w folderze (zagniezdzenia)
 usuwanie - zagniezdzone 
 
-dodawanie notatek w folderach
 edycja notatki, usuwanie notatki 
 
 edycja notatki / dodawanie folderow - obserwacja zmian na dwoch urzadzeniach
+
+---------------------------------
 
 utworzenie 2 kont 
 dodawanie znajomych, udostepnianie znajomym notatek 
@@ -20,7 +27,9 @@ ogólnie mamy aktorów, mamy rzeczy i mamy czynnosci
 
 dodawanie innego rodzaju notatek - dokumentow - pdf
 
-czat - operacje na notatkach, zapytania 
+czat do notatki - np czat do listy zakupow - mozna rozmawiac ze znajomymi
+
+czat AI - operacje na notatkach, zapytania 
 
 
 organizer - notatki jako jedna z funkcji 
@@ -34,4 +43,9 @@ taki "pożarnik" dla kazdego
 wydatki
 harmonogram/kalendarz
 lista filmow, seriali, gier - skad je pobrac?
-    
+
+
+-----------------------
+JAKO CWICZENIE:
+inny backend (np supabase) - po prostu implementacja datasource? - sprawdzic 
+inny presentation model - riverpod - sprawdzic
