@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../bloc/folder_form/folder_form_bloc.dart';
+import 'bloc/folder_form_bloc.dart';
 
 class FolderFormDialog extends StatefulWidget {
-  final String? parentId;
+  final String? folderId;
   final int maxLength = 40;
 
-  const FolderFormDialog({super.key, this.parentId});
+  const FolderFormDialog({super.key, this.folderId});
 
   @override
   State<FolderFormDialog> createState() => _FolderFormDialogState();
@@ -38,7 +38,7 @@ class _FolderFormDialogState extends State<FolderFormDialog> {
 
       if (name.isNotEmpty) {
         context.read<FolderFormBloc>().add(
-          CreateFolderSubmitted(name: name, parentId: widget.parentId),
+          CreateFolderSubmitted(name: name, parentId: widget.folderId),
         );
       }
     }

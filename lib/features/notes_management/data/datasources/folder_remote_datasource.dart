@@ -3,7 +3,7 @@ import '../../domain/entities/folder.dart';
 import '../models/folder_model.dart';
 
 abstract interface class FolderRemoteDataSource {
-  Future<List<Folder>> getFoldersByParentId(String userId, String? parentId);
+  // Future<List<Folder>> getFoldersByParentId(String userId, String? parentId);
   Stream<List<Folder>> watchFolders(String userId, String? parentId);
   Future<Folder> createFolder(Folder folder);
   Future<void> updateFolder(Folder folder);
@@ -16,29 +16,29 @@ final class FolderRemoteDataSourceImpl implements FolderRemoteDataSource {
 
   FolderRemoteDataSourceImpl(this.firestore);
 
-  @override
-  Future<List<Folder>> getFoldersByParentId(
-    String userId,
-    String? parentId,
-  ) async {
-    Query query = firestore
-        .collection('folders')
-        .where('userId', isEqualTo: userId);
+  // @override
+  // Future<List<Folder>> getFoldersByParentId(
+  //   String userId,
+  //   String? parentId,
+  // ) async {
+  //   Query query = firestore
+  //       .collection('folders')
+  //       .where('userId', isEqualTo: userId);
 
-    if (parentId == null) {
-      query = query.where('parentId', isNull: true);
-    } else {
-      query = query.where('parentId', isEqualTo: parentId);
-    }
+  //   if (parentId == null) {
+  //     query = query.where('parentId', isNull: true);
+  //   } else {
+  //     query = query.where('parentId', isEqualTo: parentId);
+  //   }
 
-    final querySnapshot = await query
-        .orderBy('createdAt', descending: true)
-        .get();
+  //   final querySnapshot = await query
+  //       .orderBy('createdAt', descending: true)
+  //       .get();
 
-    return querySnapshot.docs
-        .map((doc) => FolderModel.fromFirestore(doc))
-        .toList();
-  }
+  //   return querySnapshot.docs
+  //       .map((doc) => FolderModel.fromFirestore(doc))
+  //       .toList();
+  // }
 
   @override
   Stream<List<Folder>> watchFolders(String userId, String? parentId) {
@@ -52,11 +52,13 @@ final class FolderRemoteDataSourceImpl implements FolderRemoteDataSource {
       query = query.where('parentId', isEqualTo: parentId);
     }
 
+    // query = query.orderBy('name', descending: false);
+
     return query.snapshots().map((snapshot) {
       final list = snapshot.docs
           .map((doc) => FolderModel.fromFirestore(doc))
           .toList();
-      list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      list.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
       return list;
     });
   }

@@ -7,10 +7,10 @@ class FolderRepositoryImpl implements FolderRepository {
 
   FolderRepositoryImpl(this.remoteDataSource);
 
-  @override
-  Future<List<Folder>> getFoldersByParentId(String userId, String? parentId) async {
-    return await remoteDataSource.getFoldersByParentId(userId, parentId);
-  }
+  // @override
+  // Future<List<Folder>> getFoldersByParentId(String userId, String? parentId) async {
+  //   return await remoteDataSource.getFoldersByParentId(userId, parentId);
+  // }
 
   @override
   Stream<List<Folder>> watchFolders(String userId, String? parentId) {

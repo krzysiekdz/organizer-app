@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:organizer/features/notes_management/domain/entities/folder.dart';
+import 'package:organizer/features/notes_management/domain/entities/note.dart'
+    show Note;
+import 'note_card.dart' show NoteCard;
 import 'folder_card_alt.dart' show FolderCardAlt;
 // import 'folder_card.dart';
 
-class FoldersGrid extends StatelessWidget {
-  const FoldersGrid({super.key, required this.folders});
+class FolderContentGrid extends StatelessWidget {
+  const FolderContentGrid({super.key, required this.items});
 
-  final List<Folder> folders;
+  final List<dynamic> items;
 
   @override
   Widget build(BuildContext context) {
@@ -28,11 +31,15 @@ class FoldersGrid extends StatelessWidget {
               spacing: spacing,
               runSpacing: spacing,
               // crossAxisAlignment: WrapCrossAlignment.center,
-              children: folders
+              children: items
                   .map(
-                    (folder) => SizedBox(
+                    (item) => SizedBox(
                       width: itemWidth,
-                      child: FolderCardAlt(folder: folder),
+                      child: switch (item) {
+                        Folder() => FolderCardAlt(folder: item),
+                        Note() => NoteCard(note: item),
+                        _ => const SizedBox(width: 64, height: 64),
+                      },
                     ),
                   )
                   .toList(),

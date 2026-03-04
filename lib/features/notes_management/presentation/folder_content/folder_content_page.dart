@@ -2,49 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:organizer/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:organizer/core/injection/injection_container.dart' as di;
-import '../bloc/folder_content/folder_bloc.dart';
-import '../bloc/folder_form/folder_form_bloc.dart';
+import 'package:organizer/features/notes_management/presentation/folder_content/widgets/fab_add_new_alt.dart'
+    show FabAddNewItemAlt;
+import 'bloc/folder_bloc.dart';
 import 'package:organizer/features/notes_management/domain/repositories/folder_repository.dart';
 import 'package:organizer/features/notes_management/domain/repositories/note_repository.dart';
-import '../bloc/note_form/note_form_bloc.dart';
-import 'note_form_page.dart';
-import '../widgets/folder_form_dialog.dart';
-import '../widgets/folders_grid.dart';
+import 'widgets/folder_content_grid.dart';
 
 class NotesHomePage extends StatelessWidget {
-  const NotesHomePage({super.key});
+  const NotesHomePage({super.key, this.folderId});
+
+  final String? folderId;
 
   @override
   Widget build(BuildContext context) {
     final user = (context.read<AuthBloc>().state as AuthAuthenticated).user;
 
     return BlocProvider(
-      create: (context) => FolderBloc(
+      create: (context) => FolderContentBloc(
         folderRepository: di.sl<FolderRepository>(),
+        noteRepository: di.sl<NoteRepository>(),
         userId: user.id,
-        parentId: null,
-      )..add(const LoadFoldersByParentId(parentId: null)),
+        folderId: folderId,
+      ),
       child: Scaffold(
         appBar: AppBar(
           title: const Text('My Notes'),
           actions: [
-            IconButton(
-              icon: const Icon(Icons.note_add),
-              tooltip: 'New note',
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (context) => BlocProvider(
-                      create: (context) => NoteFormBloc(
-                        noteRepository: di.sl<NoteRepository>(),
-                        userId: user.id,
-                      ),
-                      child: const NoteFormPage(folderId: null),
-                    ),
-                  ),
-                );
-              },
-            ),
             IconButton(
               icon: const Icon(Icons.logout),
               onPressed: () {
@@ -54,34 +38,20 @@ class NotesHomePage extends StatelessWidget {
           ],
         ),
         body: SafeArea(
-          child: BlocBuilder<FolderBloc, FoldersState>(
+          child: BlocBuilder<FolderContentBloc, FolderContentState>(
             builder: (context, state) {
               return switch (state) {
-                FoldersLoading() => _buildLoadingState(context),
-                FoldersLoaded() => _buildLoadedState(context, state),
-                FoldersError() => _buildErrorState(context, state),
+                FolderContentLoading() => _buildLoadingState(context),
+                FolderContentLoaded() => _buildLoadedState(context, state),
+                FolderContentLoadError() => _buildErrorState(context, state),
+                FolderContentDeleteError() => SizedBox.shrink(),
               };
             },
           ),
         ),
-        floatingActionButton: Builder(
-          builder: (context) {
-            return FloatingActionButton(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (dialogContext) => BlocProvider(
-                    create: (context) => FolderFormBloc(
-                      folderRepository: di.sl<FolderRepository>(),
-                      userId: user.id,
-                    ),
-                    child: const FolderFormDialog(parentId: null),
-                  ),
-                );
-              },
-              child: const Icon(Icons.add),
-            );
-          },
+        floatingActionButton: FabAddNewItemAlt(
+          userId: user.id,
+          folderId: folderId,
         ),
       ),
     );
@@ -91,7 +61,7 @@ class NotesHomePage extends StatelessWidget {
     return const Center(child: CircularProgressIndicator());
   }
 
-  Widget _buildErrorState(BuildContext context, FoldersError state) {
+  Widget _buildErrorState(BuildContext context, FolderContentLoadError state) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -99,7 +69,7 @@ class NotesHomePage extends StatelessWidget {
           Icon(Icons.error_outline, size: 48, color: Colors.red.shade300),
           const SizedBox(height: 16),
           Text(
-            'Error loading folders',
+            'An error occurred',
             style: TextStyle(color: Colors.red.shade700),
           ),
           const SizedBox(height: 8),
@@ -111,8 +81,8 @@ class NotesHomePage extends StatelessWidget {
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () {
-              context.read<FolderBloc>().add(
-                const LoadFoldersByParentId(parentId: null),
+              context.read<FolderContentBloc>().add(
+                const RefreshFolderContent(),
               );
             },
             child: const Text('Retry'),
@@ -122,16 +92,19 @@ class NotesHomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildLoadedState(BuildContext context, FoldersLoaded state) {
-    final folders = state.folders;
+  Widget _buildLoadedState(BuildContext context, FolderContentLoaded state) {
+    final items = state.content;
 
-    if (folders.isEmpty) {
+    if (items.isEmpty) {
       return _buildEmptyState(context);
     }
 
-    return FoldersGrid(folders: folders);
+    return FolderContentGrid(
+      items: [...items, null],
+    ); //null to placeholder for empty space
   }
 
+  //zrobic jako osobny widget
   Widget _buildEmptyState(BuildContext context) {
     return Center(
       child: Column(

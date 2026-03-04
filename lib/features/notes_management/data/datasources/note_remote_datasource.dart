@@ -3,7 +3,8 @@ import '../../domain/entities/note.dart';
 import '../models/note_model.dart';
 
 abstract class NoteRemoteDataSource {
-  Future<List<Note>> getNotesByFolderId(String userId, String? folderId);
+  // Future<List<Note>> getNotesByFolderId(String userId, String? folderId);
+  Stream<List<Note>> watchNotes(String userId, String? folderId);
   Future<Note> createNote(Note note);
   Future<void> updateNote(Note note);
   Future<void> deleteNote(String noteId);
@@ -15,8 +16,29 @@ class NoteRemoteDataSourceImpl implements NoteRemoteDataSource {
 
   NoteRemoteDataSourceImpl(this.firestore);
 
+  // @override
+  // Future<List<Note>> getNotesByFolderId(String userId, String? folderId) async {
+  //   Query query = firestore
+  //       .collection('notes')
+  //       .where('userId', isEqualTo: userId);
+
+  //   if (folderId == null) {
+  //     query = query.where('folderId', isNull: true);
+  //   } else {
+  //     query = query.where('folderId', isEqualTo: folderId);
+  //   }
+
+  //   final querySnapshot = await query
+  //       .orderBy('createdAt', descending: true)
+  //       .get();
+
+  //   return querySnapshot.docs
+  //       .map((doc) => NoteModel.fromFirestore(doc))
+  //       .toList();
+  // }
+
   @override
-  Future<List<Note>> getNotesByFolderId(String userId, String? folderId) async {
+  Stream<List<Note>> watchNotes(String userId, String? folderId) {
     Query query = firestore
         .collection('notes')
         .where('userId', isEqualTo: userId);
@@ -27,13 +49,15 @@ class NoteRemoteDataSourceImpl implements NoteRemoteDataSource {
       query = query.where('folderId', isEqualTo: folderId);
     }
 
-    final querySnapshot = await query
-        .orderBy('createdAt', descending: true)
-        .get();
+    // query = query.orderBy('name', descending: false);
 
-    return querySnapshot.docs
-        .map((doc) => NoteModel.fromFirestore(doc))
-        .toList();
+    return query.snapshots().map((snapshot) {
+      final list = snapshot.docs
+          .map((doc) => NoteModel.fromFirestore(doc))
+          .toList();
+      list.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+      return list;
+    });
   }
 
   @override

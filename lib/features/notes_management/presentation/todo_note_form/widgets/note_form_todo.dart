@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../domain/entities/note.dart';
-import '../../domain/entities/todo_task.dart';
-import '../bloc/note_form/note_form_bloc.dart';
+import '../../../domain/entities/note.dart';
+import '../../../domain/entities/todo_task.dart';
+import '../../note/bloc/note_form_bloc.dart';
 
 class NoteFormTodo extends StatefulWidget {
   final String? folderId;

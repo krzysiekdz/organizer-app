@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../domain/entities/note.dart';
-import '../bloc/note_form/note_form_bloc.dart';
+import '../../../domain/entities/note.dart';
+import '../../note/bloc/note_form_bloc.dart';
 
-class NoteFormPlain extends StatefulWidget {
+class TextNoteForm extends StatefulWidget {
   final String? folderId;
   final int maxNameLength = 80;
   final int maxContentLength = 10000;
 
-  const NoteFormPlain({super.key, this.folderId});
+  const TextNoteForm({super.key, this.folderId});
 
   @override
-  State<NoteFormPlain> createState() => _NoteFormPlainState();
+  State<TextNoteForm> createState() => _TextNoteFormState();
 }
 
-class _NoteFormPlainState extends State<NoteFormPlain> {
+class _TextNoteFormState extends State<TextNoteForm> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _contentController = TextEditingController();

@@ -4,7 +4,7 @@ import 'package:organizer/features/auth/presentation/pages/login_page.dart'
     show LoginPage;
 import 'package:organizer/features/auth/presentation/pages/auth_loading_page.dart'
     show AuthLoadingPage;
-import 'package:organizer/features/notes_management/presentation/pages/notes_home_page.dart'
+import 'package:organizer/features/notes_management/presentation/folder_content/folder_content_page.dart'
     show NotesHomePage;
 import 'core/injection/injection_container.dart' as di;
 import 'features/auth/presentation/bloc/auth_bloc.dart';
